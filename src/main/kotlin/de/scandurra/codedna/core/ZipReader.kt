@@ -26,4 +26,17 @@ interface ZipReader : Closeable {
 
         override fun close() = zip.close()
     }
+
+    class FakeZipReader(
+        private val files: Map<String, ByteArray>,
+    ) : ZipReader {
+        override fun entries(): List<ZipEntryInfo> =
+            files.map { (name, bytes) -> ZipEntryInfo(name, bytes.size.toLong()) }
+                .sortedBy { it.name }
+
+        override fun readBytes(name: String): ByteArray =
+            files[name] ?: error("Entry not found: $name")
+
+        override fun close() {}
+    }
 }
