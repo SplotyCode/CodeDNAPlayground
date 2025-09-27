@@ -25,6 +25,23 @@ fun main(args: Array<String>) {
         }
     }
 
-    parser.subcommands(FingerprintCmd())
+    class CompareCmd : Subcommand("compare", "Compares two ZIP files") {
+        private val left by argument(ArgType.String, description = "Left ZIP")
+        private val right by argument(ArgType.String, description = "Right ZIP")
+        private val method by argument(ArgType.String, description = "Method")
+
+        override fun execute() {
+            FileZipReader(Path.of(left)).use { zl ->
+                FileZipReader(Path.of(right)).use { zr ->
+                    val comparison = service.compare(method, zl, zr)
+                    println("Result: ${comparison.result}")
+                    println("Fingerprint of left zip:  ${comparison.left}")
+                    println("Fingerprint of right zip: ${comparison.right}")
+                }
+            }
+        }
+    }
+
+    parser.subcommands(FingerprintCmd(), CompareCmd())
     parser.parse(args)
 }
