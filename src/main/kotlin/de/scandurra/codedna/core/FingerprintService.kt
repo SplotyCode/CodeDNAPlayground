@@ -4,34 +4,24 @@ import de.scandurra.codedna.core.Fingerprinter.CompareResult
 import de.scandurra.codedna.core.Fingerprinter.Fingerprint
 
 class FingerprintService() {
-    private val methods: MutableMap<String, Fingerprinter<Fingerprint>> = mutableMapOf()
+    private val methods: MutableMap<String, RegisteredMethod<*>> = mutableMapOf()
 
-    fun register(method: Fingerprinter<Fingerprint>) {
-        methods[method.name] = method
+    fun <F : Fingerprint> register(method: Fingerprinter<F>) {
+        methods[method.name] = RegisteredMethod(method)
     }
 
     fun names(): Set<String> = methods.keys
 
-    fun require(name: String) = methods[name]
+    private fun require(name: String) = methods[name]
         ?: throw IllegalArgumentException("Unknown fingerprinter $name (available: ${names()})")
-
-    fun compute(name: String, zip: ZipReader): FingerprintResult<Fingerprint> {
-        val method = require(name)
-        return FingerprintResult(method, method.compute(zip))
-    }
-
-    fun computeMultiple(names: List<String>, zip: ZipReader): List<FingerprintResult<Fingerprint>> =
-        names.map { compute(it, zip) }
 
     data class FingerprintResult<F : Fingerprint>(val strategy: Fingerprinter<F>, val fingerprint: F)
 
-    fun compare(name: String, left: ZipReader, right: ZipReader): Comparison<Fingerprint> {
-        val method = require(name)
-        val leftFingerprint = method.compute(left)
-        val rightFingerprint = method.compute(right)
-        val result = method.compare(leftFingerprint, rightFingerprint)
-        return Comparison(method, leftFingerprint, rightFingerprint, result)
-    }
+    fun compute(name: String, zip: ZipReader): FingerprintResult<*> =
+        require(name).compute(zip)
+
+    fun computeMultiple(names: List<String>, zip: ZipReader): List<FingerprintResult<*>> =
+        names.map { compute(it, zip) }
 
     data class Comparison<F : Fingerprint>(
         val strategy: Fingerprinter<F>,
@@ -39,4 +29,19 @@ class FingerprintService() {
         val right: F,
         val result: CompareResult
     )
+
+    fun compare(name: String, left: ZipReader, right: ZipReader): Comparison<*> =
+        require(name).compare(left, right)
+
+    private class RegisteredMethod<F : Fingerprint>(val strategy: Fingerprinter<F>) {
+        fun compute(zip: ZipReader): FingerprintResult<F> =
+            FingerprintResult(strategy, strategy.compute(zip))
+
+        fun compare(leftZip: ZipReader, rightZip: ZipReader): Comparison<F> {
+            val left = strategy.compute(leftZip)
+            val right = strategy.compute(rightZip)
+            val result = strategy.compare(left, right)
+            return Comparison(strategy, left, right, result)
+        }
+    }
 }

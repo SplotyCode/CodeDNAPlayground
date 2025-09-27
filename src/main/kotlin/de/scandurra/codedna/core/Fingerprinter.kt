@@ -9,6 +9,7 @@ interface Fingerprinter<F : Fingerprint> {
 
     fun compare(left: F, right: F): CompareResult
 
+    /* Ensure the fingerprint structure could be efficiently compared against millions of other fingerprints */
     interface Fingerprint
 
     interface CompareResult
