@@ -2,6 +2,7 @@ package de.scandurra.codedna
 
 import de.scandurra.codedna.core.FingerprintService
 import de.scandurra.codedna.core.ZipReader.FileZipReader
+import de.scandurra.codedna.fingerprint.ContentHashFingerprinter
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
 import kotlinx.cli.ExperimentalCli
@@ -11,6 +12,7 @@ import java.nio.file.Path
 @OptIn(ExperimentalCli::class)
 fun main(args: Array<String>) {
     val service = FingerprintService()
+    service.register(ContentHashFingerprinter())
     val parser = ArgParser("code-dna")
 
     class FingerprintCmd : Subcommand("fingerprint", "Create a fingerprint for a ZIP file") {
