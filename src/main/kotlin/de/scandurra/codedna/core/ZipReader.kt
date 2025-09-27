@@ -3,6 +3,7 @@ package de.scandurra.codedna.core
 import java.io.Closeable
 import java.nio.file.Path
 import java.util.zip.ZipFile
+import kotlin.collections.sortedBy
 
 interface ZipReader : Closeable {
     fun entries(): List<ZipEntryInfo>
@@ -17,6 +18,7 @@ interface ZipReader : Closeable {
             zip.entries().asSequence()
                 .filter { !it.isDirectory }
                 .map { ZipEntryInfo(it.name, it.size) }
+                .sortedBy { it.name }
                 .toList()
 
         override fun readBytes(name: String): ByteArray {
