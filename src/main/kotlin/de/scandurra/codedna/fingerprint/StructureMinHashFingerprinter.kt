@@ -18,16 +18,9 @@ class StructureMinHashFingerprinter(
     data class Result(val jaccardEstimate: Double) : CompareResult
 
     override fun compute(zip: ZipReader): MinHashFingerprint {
-        val features = zip.entries().map { e ->
-            val role = when {
-                e.name.endsWith(".class") -> "C"
-                e.name.endsWith(".xml") || e.name.endsWith(".properties") -> "R"
-                else -> "O"
-            }
-            val path = e.name
-            val sizeBucket = (e.size / 1024)
-            "$role|$path|$sizeBucket"
-        }.toSet()
+        val features = zip.entries()
+            .map { e -> "${e.name}|${(e.size / 1024)}" }
+            .toSet()
         val signature = IntArray(hashFunctions) { Int.MAX_VALUE }
         for (feature in features) {
             for (hashFunction in 0 until hashFunctions) {
