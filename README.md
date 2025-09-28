@@ -4,7 +4,7 @@ A small Kotlin project that demonstrates computing and comparing fingerprints of
 
 ## Fingerprint implementation
 - content-hash: Computes a SHA‑256 hash over the concatenated contents of all entries inside a ZIP.
-- structure-minhash: Computes a MinHash signature based on simple structural features of the ZIP (file roles, paths, and size buckets) to estimate Jaccard similarity.
+- structure-minhash: Computes a MinHash signature based on simple structural features of the ZIP (paths, and size buckets) to estimate Jaccard similarity.
 
 ## Usage
 Compute a fingerprint

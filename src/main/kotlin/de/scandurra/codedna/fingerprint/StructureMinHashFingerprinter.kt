@@ -8,8 +8,7 @@ import de.scandurra.codedna.core.ZipReader
 import de.scandurra.codedna.fingerprint.StructureMinHashFingerprinter.MinHashFingerprint
 
 class StructureMinHashFingerprinter(
-    private val hashFunctions: Int = 128,
-    private val seeds: IntArray = IntArray(hashFunctions) { 0x9e379b9 * (it + 1) }
+    private val minHash: Hashes.MinHash = Hashes.MinHash(128),
 ) : Fingerprinter<MinHashFingerprint> {
 
     override val name = "structure-minhash"
@@ -21,18 +20,7 @@ class StructureMinHashFingerprinter(
         val features = zip.entries()
             .map { e -> "${e.name}|${(e.size / 1024)}" }
             .toSet()
-        val signature = IntArray(hashFunctions) { Int.MAX_VALUE }
-        for (feature in features) {
-            for (hashFunction in 0 until hashFunctions) {
-                val hash = Hashes.sha256 {
-                    it.update(seeds[hashFunction].toLong().toString(16).toByteArray())
-                    it.update(feature.toByteArray())
-                }.substring(0, 8).toLong(16).toInt()
-                if (hash < signature[hashFunction]) {
-                    signature[hashFunction] = hash
-                }
-            }
-        }
+        val signature = minHash.hash(features.map { it.toByteArray() })
         return MinHashFingerprint(signature)
     }
 
