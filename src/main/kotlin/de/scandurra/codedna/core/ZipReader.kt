@@ -9,7 +9,9 @@ interface ZipReader : Closeable {
     fun entries(): List<ZipEntryInfo>
     fun readBytes(name: String): ByteArray
 
-    data class ZipEntryInfo(val name: String, val size: Long)
+    data class ZipEntryInfo(val name: String, val size: Long) {
+        fun isClassFile() = name.endsWith(".class", ignoreCase = true)
+    }
 
     class FileZipReader(path: Path) : ZipReader {
         private val zip = ZipFile(path.toFile())
