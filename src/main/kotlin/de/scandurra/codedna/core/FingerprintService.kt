@@ -3,7 +3,7 @@ package de.scandurra.codedna.core
 import de.scandurra.codedna.core.Fingerprinter.CompareResult
 import de.scandurra.codedna.core.Fingerprinter.Fingerprint
 
-class FingerprintService() {
+class FingerprintService {
     private val methods: MutableMap<String, RegisteredMethod<*>> = mutableMapOf()
 
     fun <F : Fingerprint> register(method: Fingerprinter<F>) {
