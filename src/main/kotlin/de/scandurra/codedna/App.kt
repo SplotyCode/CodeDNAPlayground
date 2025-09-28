@@ -22,9 +22,10 @@ fun main(args: Array<String>) {
         private val method by argument(ArgType.String, description = "Method")
 
         override fun execute() {
-            FileZipReader(Path.of(path)).use { zr ->
-                val fp = service.compute(method, zr)
-                println(fp.fingerprint)
+            FileZipReader(Path.of(path)).use { zipReader ->
+                println("Using: $method...")
+                val result = service.compute(method, zipReader)
+                println("Result: ${result.fingerprint}")
             }
         }
     }
@@ -35,9 +36,9 @@ fun main(args: Array<String>) {
         private val method by argument(ArgType.String, description = "Method")
 
         override fun execute() {
-            FileZipReader(Path.of(left)).use { zl ->
-                FileZipReader(Path.of(right)).use { zr ->
-                    val comparison = service.compare(method, zl, zr)
+            FileZipReader(Path.of(left)).use { leftZip ->
+                FileZipReader(Path.of(right)).use { rightZip ->
+                    val comparison = service.compare(method, leftZip, rightZip)
                     println("Result: ${comparison.result}")
                     println("Fingerprint of left zip:  ${comparison.left}")
                     println("Fingerprint of right zip: ${comparison.right}")
