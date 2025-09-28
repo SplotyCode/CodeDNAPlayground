@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm") version "2.2.0"
+    application
 }
 
 group = "de.scandurra"
@@ -19,4 +20,7 @@ tasks.test {
 }
 kotlin {
     jvmToolchain(23)
+}
+application {
+    mainClass.set("de.scandurra.codedna.AppKt")
 }
